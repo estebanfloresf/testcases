@@ -8,7 +8,9 @@
 import scrapy
 
 
-class TestcasesItem(scrapy.Item):
+class TestCasesItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
+    Component_Name = scrapy.Field()
+    requirements = scrapy.Field()
     pass

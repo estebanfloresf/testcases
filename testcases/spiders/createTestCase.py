@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.utils.project import get_project_settings
+from ..items import TestCasesItem
 
 
 class createTestCaseSpider(scrapy.Spider):
@@ -9,24 +10,44 @@ class createTestCaseSpider(scrapy.Spider):
     http_user = settings.get('HTTP_USER')
     http_pass = settings.get('HTTP_PASS')
     allowed_domains = ["confluence.verndale.com"]
-    start_urls = ['https://confluence.verndale.com/display/GEHC/Course+Offering+Module']
+    start_urls = ['https://confluence.verndale.com/pages/viewpage.action?spaceKey=GEHC&title=Generic+Hero']
 
     def parse(self, response):
-        components = response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr')
-        for row in components:
-            item = row.select('.//text()').extract()
-            print('Verify '+item[1]+' component')
+        item = TestCasesItem()
+        table =  response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody')
 
-        # for url in self.start_urls:
-        #     # Xpath String for Requirements
-        #     xpathstring = "//*[@id='main-content']/div/div[4]/div/div/div[1]/table/tbody/tr[4]/td[3]/div[contains(@class,'content-wrapper')]"
-        #     requirements = response.xpath(xpathstring + "/ul/li/text() | " + xpathstring + "/ul/li/span/text()"
-        #                                   ).extract()
-        #
-        #     print(requirements)
+        # print(len(table))
 
-
-            # for row in requirements:
+        for row in table:
+            components = row.select('.//tr/td[2]/text() | .//tr/td[2]/p/text()').extract()
+            # for comp in components:
             #
-            #     item = row.select('.//text()').extract()
-            #     print('Verify '+str(item)+' component')
+            #     item['Component_Name'] = str(comp)
+            #     yield item
+            look = ".//tr[3]/td[3]/div[contains(@class,'content-wrapper')]"
+            # requirements = row.select(look+"//*/string(p)  | "+look+"//*/ul/li/text()[normalize-space(.)]  | "+look+"//*/ul/li/span/text()[normalize-space(.)]  | "+look+"//*/ul/li/strong/span/text()[normalize-space(.)] ").extract()
+            requirements = row.select(look+"//*/descendant-or-self::*/text()[normalize-space()] ").extract()
+
+
+            # This is working manually hard coded
+            # requirements =  row.select(look+"//*/text()[normalize-space()]").extract()
+            # wordsout = ['Recommendation:','Optional','Required','Standard Value','Note:','Recommended Dimensions:']
+            # save = ""
+            for i,req in enumerate (requirements):
+                req = req.replace(u'\xa0', u' ').strip()
+                print(req)
+            #
+            #
+            #     if(req in wordsout):
+            #         save = req
+            #
+            #     else :
+            #         if(save!=''):
+            #             print(save+' '+req)
+            #             save=""
+            #         else:
+            #             print(req)
+
+
+
+
