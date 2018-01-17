@@ -29,10 +29,11 @@ class createTestCaseSpider(scrapy.Spider):
                 wordtojoin = ""
                 finalreq = []
 
-                for req in requirements:
-                    test = req.xpath("string(.//text())").extract()
-                    for t in test:
+                for req in requirements.xpath('.//*//*//*'):
+                    for t in req:
                         print(t)
+
+
 
 
 
