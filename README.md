@@ -1,2 +1,2 @@
-# testcases
+# TestCases
 Testcases Automation

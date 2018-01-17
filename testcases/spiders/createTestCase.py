@@ -16,54 +16,34 @@ class createTestCaseSpider(scrapy.Spider):
         item = TestCasesItem()
         table = response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr')
 
+
         for row in table:
 
             components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract()
             for comp in components:
                 item['Component_Name'] = str(comp)
 
-                requirements = row.xpath(
-                    ".//td[3]/div[contains(@class,'content-wrapper')]//*/descendant-or-self::*")
+                requirements = row.select(
+                    ".//td[3]/div[contains(@class,'content-wrapper')]//*/descendant-or-self::*/text()[normalize-space()]").extract()
                 wordstolook = ['Recommendation:', 'Optional', 'Required', 'Standard Value:', 'Note:', 'Notes:',
                                'Recommended Dimensions:','See']
                 wordtojoin = ""
                 finalreq = []
 
-                for req in requirements.xpath('.//*//*//*'):
-                    for t in req:
-                        print(t)
+                for req in requirements:
 
+                    req = req.replace(u'\xa0', u' ').replace(u'&nbsp', u'').strip()
+                    if (req in wordstolook):
+                        wordtojoin = req
 
+                    else:
+                        if (wordtojoin != ''):
+                            finalreq.append(wordtojoin + ' ' + req)
+                            wordtojoin = ""
+                        else:
+                            finalreq.append(req)
 
-
-
-        # for row in table:
-        #
-        #     components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract()
-        #     for comp in components:
-        #         item['Component_Name'] = str(comp)
-        #
-        #         requirements = row.select(
-        #             ".//td[3]/div[contains(@class,'content-wrapper')]//*/descendant-or-self::*/text()[normalize-space()]").extract()
-        #         wordstolook = ['Recommendation:', 'Optional', 'Required', 'Standard Value:', 'Note:', 'Notes:',
-        #                        'Recommended Dimensions:','See']
-        #         wordtojoin = ""
-        #         finalreq = []
-        #
-        #         for req in requirements:
-        #
-        #             req = req.replace(u'\xa0', u' ').replace(u'&nbsp', u'').strip()
-        #             if (req in wordstolook):
-        #                 wordtojoin = req
-        #
-        #             else:
-        #                 if (wordtojoin != ''):
-        #                     finalreq.append(wordtojoin + ' ' + req)
-        #                     wordtojoin = ""
-        #                 else:
-        #                     finalreq.append(req)
-        #
-        #         item['Requirements'] = finalreq
-        #         yield item
-        #         # print(comp+' Component has been generated')
-        #         print('Verify '+comp+' Component')
+                item['Requirements'] = finalreq
+                yield item
+                # print(comp+' Component has been generated')
+                print('Verify '+comp+' Component')
