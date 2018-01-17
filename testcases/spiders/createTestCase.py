@@ -10,44 +10,59 @@ class createTestCaseSpider(scrapy.Spider):
     http_user = settings.get('HTTP_USER')
     http_pass = settings.get('HTTP_PASS')
     allowed_domains = ["confluence.verndale.com"]
-    start_urls = ['https://confluence.verndale.com/pages/viewpage.action?spaceKey=GEHC&title=Generic+Hero']
+    start_urls = ['https://confluence.verndale.com/pages/viewpage.action?spaceKey=GEHC&title=Primary+Navigation+-+DOC']
 
     def parse(self, response):
         item = TestCasesItem()
-        table =  response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody')
-
-        # print(len(table))
+        table = response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr')
 
         for row in table:
-            components = row.select('.//tr/td[2]/text() | .//tr/td[2]/p/text()').extract()
-            # for comp in components:
-            #
-            #     item['Component_Name'] = str(comp)
-            #     yield item
-            look = ".//tr[3]/td[3]/div[contains(@class,'content-wrapper')]"
-            # requirements = row.select(look+"//*/string(p)  | "+look+"//*/ul/li/text()[normalize-space(.)]  | "+look+"//*/ul/li/span/text()[normalize-space(.)]  | "+look+"//*/ul/li/strong/span/text()[normalize-space(.)] ").extract()
-            requirements = row.select(look+"//*/descendant-or-self::*/text()[normalize-space()] ").extract()
 
+            components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract()
+            for comp in components:
+                item['Component_Name'] = str(comp)
 
-            # This is working manually hard coded
-            # requirements =  row.select(look+"//*/text()[normalize-space()]").extract()
-            # wordsout = ['Recommendation:','Optional','Required','Standard Value','Note:','Recommended Dimensions:']
-            # save = ""
-            for i,req in enumerate (requirements):
-                req = req.replace(u'\xa0', u' ').strip()
-                print(req)
-            #
-            #
-            #     if(req in wordsout):
-            #         save = req
-            #
-            #     else :
-            #         if(save!=''):
-            #             print(save+' '+req)
-            #             save=""
-            #         else:
-            #             print(req)
+                requirements = row.xpath(
+                    ".//td[3]/div[contains(@class,'content-wrapper')]//*/descendant-or-self::*")
+                wordstolook = ['Recommendation:', 'Optional', 'Required', 'Standard Value:', 'Note:', 'Notes:',
+                               'Recommended Dimensions:','See']
+                wordtojoin = ""
+                finalreq = []
+
+                for req in requirements:
+                    test = req.xpath("string(.//text())").extract()
+                    for t in test:
+                        print(t)
 
 
 
-
+        # for row in table:
+        #
+        #     components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract()
+        #     for comp in components:
+        #         item['Component_Name'] = str(comp)
+        #
+        #         requirements = row.select(
+        #             ".//td[3]/div[contains(@class,'content-wrapper')]//*/descendant-or-self::*/text()[normalize-space()]").extract()
+        #         wordstolook = ['Recommendation:', 'Optional', 'Required', 'Standard Value:', 'Note:', 'Notes:',
+        #                        'Recommended Dimensions:','See']
+        #         wordtojoin = ""
+        #         finalreq = []
+        #
+        #         for req in requirements:
+        #
+        #             req = req.replace(u'\xa0', u' ').replace(u'&nbsp', u'').strip()
+        #             if (req in wordstolook):
+        #                 wordtojoin = req
+        #
+        #             else:
+        #                 if (wordtojoin != ''):
+        #                     finalreq.append(wordtojoin + ' ' + req)
+        #                     wordtojoin = ""
+        #                 else:
+        #                     finalreq.append(req)
+        #
+        #         item['Requirements'] = finalreq
+        #         yield item
+        #         # print(comp+' Component has been generated')
+        #         print('Verify '+comp+' Component')
