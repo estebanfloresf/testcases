@@ -10,7 +10,7 @@ class createTestCaseSpider(scrapy.Spider):
     http_user = settings.get('HTTP_USER')
     http_pass = settings.get('HTTP_PASS')
     allowed_domains = ["confluence.verndale.com"]
-    start_urls = ['https://confluence.verndale.com/pages/viewpage.action?spaceKey=GEHC&title=Primary+Navigation+-+DOC']
+    start_urls = ['https://confluence.verndale.com/display/GEHC/Footer+%7C+DOC']
 
     def parse(self, response):
         item = TestCasesItem()
@@ -21,7 +21,7 @@ class createTestCaseSpider(scrapy.Spider):
 
             components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract()
             for comp in components:
-                item['Component_Name'] = str(comp)
+                item['Component_Name'] = "Verify "+ str(comp)+ " component"
 
                 requirements = row.select(
                     ".//td[3]/div[contains(@class,'content-wrapper')]//*/descendant-or-self::*/text()[normalize-space()]").extract()

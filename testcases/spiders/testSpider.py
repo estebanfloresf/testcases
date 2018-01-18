@@ -10,7 +10,7 @@ class TestspiderSpider(scrapy.Spider):
     http_user = settings.get('HTTP_USER')
     http_pass = settings.get('HTTP_PASS')
     allowed_domains = ["confluence.verndale.com"]
-    start_urls = ['https://confluence.verndale.com/display/GEHC/Primary+Navigation+-+DOC']
+    start_urls = ['https://confluence.verndale.com/display/GEHC/Footer+%7C+DOC']
 
     def parse(self, response):
         item = TestCasesItem()
@@ -18,44 +18,52 @@ class TestspiderSpider(scrapy.Spider):
 
 
         for index,row in enumerate(table):
-            components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract_first()
-            print('\n'+str(index)+' '+str(components))
+            component = row.select('.//td[2]/text() | .//td[2]/p/text()').extract_first()
+            print('\n'+str(index)+' '+str(component))
+            item['component'] = component
 
-            # for comp in components:
-            #     item['Component_Name'] = str(comp)
 
-            requirements = row.xpath(".//td[3]/div[contains(@class,'content-wrapper')]")
+
+            responsive_req = row.xpath(".//td[3]/div[contains(@class,'content-wrapper')]")
             # wordstolook = ['Recommendation:', 'Optional', 'Required', 'Standard Value:', 'Note:', 'Notes:',
             #                'Recommended Dimensions:','See']
             # wordtojoin = ""
             # finalreq = []
 
-            responsivereq = ".//div[contains(@class,'confluence-information-macro confluence-information-macro-information conf-macro output-block')]"
-            for req in requirements.xpath(responsivereq):
+            responsive = {}
+            resp_devices = []
+            resp_general = []
+            resp_dev_general = []
 
-                print(req.select("./p/text()").extract_first())
+            path = ".//div[contains(@class,'confluence-information-macro confluence-information-macro-information conf-macro output-block')]"
+            for req in responsive_req.xpath(path):
 
-                # for elem in req.xpath(" .//div/p | .//div/ul/li"):
-                #     if (elem.xpath("string(.//text())").extract_first() != ""):
-                #         print(elem.xpath("string(.//text())").extract_first())
+                # print(req.select("./p/text()").extract_first())
 
                 for elem in req.xpath(" .//div "):
+                    resp_devices = elem.xpath("./p/span/text()").extract()
+                    resp_general = elem.xpath("./p/text()").extract()
 
-                    if(elem.xpath(".//p/span/text()").extract()):
-                        for p in elem.xpath(".//p/span/text()"):
-                            print("parrafo")
+                    # for p in elem.xpath("  ./p"):
                     #
-                    # if (elem.xpath("./ul")):
-                    #     print("Lista")
+                    #     if(p.select('.//text()').extract_first()):
+                    #         print( p.select('.//text()').extract())
+                    # print(devices)
 
-                    # for subtitle in elem.xpath(".//p/text()  | .//p/span/text()").extract():
-                    #     print(subtitle)
-                    #     self.seekChildNodes(elem)
+                    if(elem.xpath("./ul")):
+                        self.seekNestedLists(elem)
+                       
 
 
+    def seekNestedLists(self,path):
+        
+        for ul in  path.xpath("./ul"):
 
+            if (ul.xpath('./li/text() | ./li/span/text()')):
+                # for li in  ul.xpath('./li/text() | ./li/span/text()').extract():
+                #     # print(str(index)+str(liNum+1)+' '+li)
+                #     print("req %s.%s %s" %(index,liNum+1,li))
+                print(ul.xpath('./li/text() | ./li/span/text()').extract())
 
-    def seekChildNodes(self,path):
-       if(len(path.xpath(".//ul"))>0):
-           for elem in path.xpath("string(.//ul/li/text())").extract():
-              print(elem)
+            if(ul.xpath('./li/ul')):
+                self.seekNestedLists(ul.xpath('./li'))

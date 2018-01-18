@@ -25,7 +25,7 @@ class CSVExportPipelines(object):
         file = open('%s.csv' % spider.name, 'wb')
         self.files[spider] = file
         self.exporter = CsvItemExporter(file, include_headers_line=True, join_multivalued='|', lineterminator='\n')
-        self.exporter.fields_to_export = ['Component_Name','Requirements']
+        self.exporter.fields_to_export = ['component','requirements']
         self.exporter.start_exporting()
 
     def spider_closed(self, spider):
@@ -34,7 +34,7 @@ class CSVExportPipelines(object):
         file.close()
 
     def process_item(self, item, spider):
-        required_fields = ['Component_Name']  # your list of required fields
+        required_fields = ['component']  # your list of required fields
         if all(field in item for field in required_fields):
             self.exporter.export_item(item)
             return item
@@ -65,7 +65,7 @@ class JsonExportPipelines(object):
             file.close()
 
         def process_item(self, item, spider):
-            required_fields = ['Component_Name']  # your list of required fields
+            required_fields = ['component']  # your list of required fields
             if all(field in item for field in required_fields):
                 self.exporter.export_item(item)
                 return item
