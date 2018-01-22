@@ -9,8 +9,21 @@ import scrapy
 
 
 class TestCasesItem(scrapy.Item):
-    # define the fields for your item here like:
-    # name = scrapy.Field()
     component = scrapy.Field()
+    requirements = scrapy.Field()
+    responsive = scrapy.Field()
+    pass
+
+
+class Requirements(scrapy.Item):
+    # type => general or device accordingly
+    # type = scrapy.Field()
+    level = scrapy.Field()
+    description = scrapy.Field()
+    pass
+
+
+class ResponsiveReq(scrapy.Item):
+    device = scrapy.Field()
     requirements = scrapy.Field()
     pass

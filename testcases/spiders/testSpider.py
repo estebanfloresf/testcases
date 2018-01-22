@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import scrapy
 from scrapy.utils.project import get_project_settings
-from ..items import TestCasesItem
+from ..items import TestCasesItem, ResponsiveReq, Requirements
 
 
 class TestspiderSpider(scrapy.Spider):
@@ -13,56 +13,59 @@ class TestspiderSpider(scrapy.Spider):
     start_urls = ['https://confluence.verndale.com/display/GEHC/Footer+%7C+DOC']
 
     def parse(self, response):
-        item = TestCasesItem()
+        testcase = TestCasesItem()
+
         table = response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr')
 
         for index, row in enumerate(table):
+            responsive = ResponsiveReq()
+            requirements = Requirements()
             component = row.select('.//td[2]/text() | .//td[2]/p/text()').extract_first()
             print('\n' + str(index) + ' ' + str(component))
-            item['component'] = component
+            testcase['component'] = component
 
+            # Section Responsive Notes
             responsive_req = row.xpath(".//td[3]/div[contains(@class,'content-wrapper')]")
-            # wordstolook = ['Recommendation:', 'Optional', 'Required', 'Standard Value:', 'Note:', 'Notes:',
-            #                'Recommended Dimensions:','See']
-            # wordtojoin = ""
-            # finalreq = []
-
-            responsive = {}
-            resp_devices = []
-            resp_general = []
-            resp_devices_req = []
-
             path = ".//div[contains(@class,'confluence-information-macro confluence-information-macro-information conf-macro output-block')]"
             for req in responsive_req.xpath(path):
 
-                # print(req.select("./p/text()").extract_first())
-
                 for elem in req.xpath(" .//div "):
-                    resp_devices = elem.xpath("./p/span/text()").extract()
-                    resp_general = elem.xpath("./p/text()").extract()
+                    # Save Devices
 
-                    # for p in elem.xpath("  ./p"):
-                    #
-                    #     if(p.select('.//text()').extract_first()):
-                    #         print( p.select('.//text()').extract())
-                    # print(devices)
+                    devices = elem.xpath("./p/span/text()").extract()
 
-                    if (elem.xpath("./ul")):
-                        resp_devices_req = self.seekNestedLists(elem,index)
-            print(list(zip(resp_devices,resp_devices_req)))
+                    # Save General Requirements from Responsive Notes
+                    for req in elem.xpath("./p/text()").extract():
+                        responsive['requirements'] = str(req).strip()
 
 
-    def seekNestedLists(self, path,index):
-        all = []
-        for indexUL,ul in enumerate(path.xpath("./ul")):
+                    levelpath = "/ul"
+                    parentLevel = 0
+                    band = 0
+                    finalresreq = []
 
+                    while (elem.xpath('.' + levelpath + '/li')):
 
-            if (ul.xpath("./li/text() | ./li/span[not(contains(@class,'confluence-embedded-file-wrapper confluence-embedded-manual-size'))]/text()")):
-                # for indexLI,li in enumerate(ul.xpath('./li/text() | ./li/span/text()').extract()):
-                all.append(ul.xpath('./li/text() | ./li/span/text()').extract())
-        return all
-                # if (ul.xpath('./li/ul')):
-                #         self.seekNestedLists(ul.xpath('./li'),str(index)+'-'+str(indexLI+1))
+                        for ulnum, ul in enumerate(elem.xpath('.' + levelpath)):
 
+                            for linum, li in enumerate(ul.xpath('./li | ./li/span')):
+                                itemreq = {}
+                                key = str(ulnum) + '.' + str(linum)
+                                if (band > 0): key += '.' + str(band)
+                                if (li.xpath('./text()').extract()):
+                                    # print(key +' ' +str(li.xpath('./text()').extract_first()))
+                                    itemreq[str(key)] = li.xpath('./text()').extract_first()
+                                    itemreq['device'] = devices[ulnum]
 
+                                    finalresreq.append(itemreq)
 
+                                if (li.xpath('./ul').extract()):
+                                    band = linum
+
+                        levelpath += '/li/' + levelpath
+                        parentLevel += 1
+                    print(finalresreq)
+
+                    # responsive['requirements']= finalresreq
+            testcase['responsive'] = [dict(responsive)]
+            yield testcase
