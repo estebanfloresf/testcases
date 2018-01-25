@@ -10,7 +10,7 @@ class TestspiderSpider(scrapy.Spider):
     http_user = settings.get('HTTP_USER')
     http_pass = settings.get('HTTP_PASS')
     allowed_domains = ["confluence.verndale.com"]
-    start_urls = ['https://confluence.verndale.com/display/GEHC/Footer+%7C+DOC']
+    start_urls = ['https://confluence.verndale.com/display/GEHC/S-Curve+Module']
 
     def parse(self, response):
         testcase = TestCasesItem()
@@ -19,15 +19,15 @@ class TestspiderSpider(scrapy.Spider):
 
         for index, row in enumerate(table):
             responsive = ResponsiveReq()
-            requirements = Requirements()
+
             component = row.select('.//td[2]/text() | .//td[2]/p/text()').extract_first()
             print('\n' + str(index) + ' ' + str(component))
             testcase['component'] = component
 
             # Section Responsive Notes
-            responsive_req = row.xpath(".//td[3]/div[contains(@class,'content-wrapper')]")
+            responsive_req_path = row.xpath(".//td[3]/div[contains(@class,'content-wrapper')]")
             path = ".//div[contains(@class,'confluence-information-macro confluence-information-macro-information conf-macro output-block')]"
-            for req in responsive_req.xpath(path):
+            for req in responsive_req_path.xpath(path):
 
                 for elem in req.xpath(" .//div "):
                     # Save Devices
@@ -37,35 +37,46 @@ class TestspiderSpider(scrapy.Spider):
                     # Save General Requirements from Responsive Notes
                     for req in elem.xpath("./p/text()").extract():
                         responsive['requirements'] = str(req).strip()
-
+                        yield responsive
 
                     levelpath = "/ul"
                     parentLevel = 0
-                    band = 0
+                    band = ""
                     finalresreq = []
-
+                    lichild = []
                     while (elem.xpath('.' + levelpath + '/li')):
 
                         for ulnum, ul in enumerate(elem.xpath('.' + levelpath)):
 
                             for linum, li in enumerate(ul.xpath('./li | ./li/span')):
-                                itemreq = {}
-                                key = str(ulnum) + '.' + str(linum)
-                                if (band > 0): key += '.' + str(band)
+                                requirement = Requirements()
+
+                                if (len(lichild) > 0 and parentLevel >= 1):
+                                    key = ("%s.%s.%s" % (index, lichild[ulnum], linum))
+                                else:
+                                    key = ("%s.%s" % (index, linum))
+
                                 if (li.xpath('./text()').extract()):
                                     # print(key +' ' +str(li.xpath('./text()').extract_first()))
-                                    itemreq[str(key)] = li.xpath('./text()').extract_first()
-                                    itemreq['device'] = devices[ulnum]
+                                    requirement['description'] = li.xpath('./text()').extract_first()
+                                    requirement['level'] = key
 
-                                    finalresreq.append(itemreq)
+                                    finalresreq.append(requirement)
+
 
                                 if (li.xpath('./ul').extract()):
-                                    band = linum
+                                    lichild.append(str(linum))
+                            responsive['device'] = devices[ulnum]
+                            responsive['requirements'] = finalresreq
+                            finalresreq =[]
+                            yield responsive
+
+
+
+
 
                         levelpath += '/li/' + levelpath
                         parentLevel += 1
-                    print(finalresreq)
 
-                    # responsive['requirements']= finalresreq
-            testcase['responsive'] = [dict(responsive)]
+            testcase['responsivereq'] = [dict(responsive)]
             yield testcase

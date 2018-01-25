@@ -25,7 +25,7 @@ class CSVExportPipelines(object):
         file = open('%s.csv' % spider.name, 'wb')
         self.files[spider] = file
         self.exporter = CsvItemExporter(file, include_headers_line=True, join_multivalued='|', lineterminator='\n')
-        self.exporter.fields_to_export = ['component','requirements']
+        self.exporter.fields_to_export = ['component','generalreq','responsivereq']
         self.exporter.start_exporting()
 
     def spider_closed(self, spider):
