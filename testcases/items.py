@@ -15,15 +15,16 @@ class TestCasesItem(scrapy.Item):
     pass
 
 
+
+
 class Requirements(scrapy.Item):
-    # type => general or device accordingly
-    # type = scrapy.Field()
+
     level = scrapy.Field()
     description = scrapy.Field()
     pass
 
 
-class ResponsiveReq(scrapy.Item):
+class Responsive(scrapy.Item):
     device = scrapy.Field()
     requirements = scrapy.Field()
     pass
