@@ -10,8 +10,8 @@ import scrapy
 
 class TestCasesItem(scrapy.Item):
     component = scrapy.Field()
-    requirements = scrapy.Field()
-    responsive = scrapy.Field()
+    generalreq = scrapy.Field()
+    responsivereq = scrapy.Field()
     pass
 
 
