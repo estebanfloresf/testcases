@@ -23,74 +23,95 @@ class TestspiderSpider(scrapy.Spider):
     def parse(self, response):
 
         table = response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr')
-
         for index, row in enumerate(table):
             testcase = TestCasesItem()
             if index > 0:
                 testcase['component'] = str(row.select('.//td[2]/text() | .//td[2]/p/text()').extract_first()).strip()
-
                 request = Request(
                     self.start_urls[0],
                     callback=self.responsive_req,
                     errback=self.errback_httpbin,
-                    dont_filter=True
+                    dont_filter=True,
+                    meta={'testcase': testcase, 'row': row}
                 )
-                request.meta['testcase'] = testcase
-                request.meta['row'] = row
 
                 yield request
 
-
-
     def responsive_req(self, response):
 
-        testcase = response.meta['testcase']
         row = response.meta['row']
-        devices = []   # List to store all the responsive dict
+        testcase = response.meta['testcase']
+        list_responsive = []
 
         # Section Responsive Notes
         responsive_path = row.xpath(".//td[3]/div[contains(@class,'content-wrapper')]")
         path = ".//div[contains(@class,'confluence-information-macro confluence-information-macro-information conf-macro output-block')]"
-        for req in responsive_path.xpath(path):
 
-            for device in req.xpath(".//div/p/span/text()").extract():
-                # Save Devices
-                responsive = Responsive()
-                responsive['device'] = str(device).strip(':')
-                request = Request(
-                    self.start_urls[0],
-                    callback=self.requirements,
-                    errback=self.errback_httpbin,
-                    dont_filter=True
-                )
-                request.meta['responsive'] = responsive
-                request.meta['row'] = row
+        # If to see if the component has responsive requirements
+        if responsive_path.xpath(path):
 
-                yield request
-                # After creating the item appended to the devices list
+            for req in responsive_path.xpath(path):
 
-                devices.append(responsive)
+                # If to see if the responsive requirements has devices
+                if req.xpath(".//div/p/span/text()").extract():
 
-        # Final testcase is added the devices and requirements for each
-        testcase['responsive'] = devices
-        yield testcase
+                    for device in req.xpath(".//div/p/span/text()").extract():
 
-    def requirements(self,response):
-        devices = ['Desktop','Tablet','Mobile','Desktop/Tablet','Tablet/Mobile']
+                        # Save Devices
+                        responsive = Responsive()
+                        responsive['device'] = str(device).strip(':')
+                        request = Request(
+                            self.start_urls[0],
+                            callback=self.requirements,
+                            errback=self.errback_httpbin,
+                            dont_filter=True,
+                            meta={'responsive': responsive, 'row': row, 'testcase': testcase}
+                        )
+                        yield request
+
+                else:
+                    responsive = Responsive()
+                    requirement = Requirements()
+                    requirement_list = []
+                    for index,req in enumerate(req.xpath(".//div/p/text()").extract()):
+                        requirement['description'] = req
+                        requirement_list.append(requirement)
+
+                    responsive['requirements']=requirement_list
+                    testcase['responsive'] = responsive
+                    yield testcase
+
+
+        else:
+
+            yield testcase
+
+            # testcase['responsive'] = list_responsive
+
+    def requirements(self, response):
+
         responsive = response.meta['responsive']
-        requirements = []
-        path = ".//div[contains(@class,'confluence-information-macro-body')]//*/text()"
-
-        for elem in response.xpath(path).extract():
-            if(str(elem).strip(':') not in responsive['device']):
-                requirements.append(str(elem).strip())
-
-        responsive['requirements'] = requirements
-        yield responsive
+        testcase = response.meta['testcase']
+        responsive['requirements'] = "sample"
+        testcase['responsive'] = responsive
 
 
 
-
+        #
+        # requirements = []
+        # path = ".//div[contains(@class,'confluence-information-macro-body')]//*/text()"
+        #
+        # for elem in response.xpath(path).extract():
+        #     if (str(elem).strip(':') not in responsive['device']):
+        #         requirements.append(str(elem).strip())
+        #
+        # responsive['requirements'] = requirements
+        # # Final testcase is added the devices and requirements for each
+        #
+        # # After creating the item appended to the devices list
+        # devices.append(responsive)
+        # testcase['responsive'] = devices
+        # yield testcase
 
     # Function for handling Errors
     def errback_httpbin(self, failure):

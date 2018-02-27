@@ -11,14 +11,3 @@ cmdline.execute(("scrapy crawl testspider -a "+str(sys.argv[1])).split())
 #
 #
 # #
-#
-
-
-# from scrapy.crawler import CrawlerProcess
-# from scrapy.utils.project import get_project_settings
-#
-# process = CrawlerProcess(get_project_settings())
-#
-# # 'followall' is the name of one of the spiders of the project.
-# process.crawl('testspider', url='https://confluence.verndale.com/display/GEHC/Footer+%7C+DOC')
-# process.start()
