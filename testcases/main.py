@@ -6,8 +6,8 @@ import sys
 #     cmdline.execute(("scrapy crawl testspider -a url=https://confluence.verndale.com/display/GEHC/Footer+%7C+DOC").split())
 #
 #
-# # cmdline.execute("scrapy crawl createTestCase".split())
-cmdline.execute(("scrapy crawl testspider -a "+str(sys.argv[1])).split())
+cmdline.execute("scrapy crawl createTestCase".split())
+# cmdline.execute(("scrapy crawl testspider -a "+str(sys.argv[1])).split())
 #
 #
 # #

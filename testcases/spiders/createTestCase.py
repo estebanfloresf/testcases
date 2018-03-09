@@ -47,27 +47,6 @@ class createTestCaseSpider(scrapy.Spider):
                     else:
                         finalreq.append(req)
 
-            item['generalreq'] = finalreq
+            item['general'] = finalreq
             yield item
 
-
-    # def parse(self, response):
-    #     table = response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr')
-    #     testitem = ItemLoader()
-    #
-    #     for row in table:
-    #         testitem = ItemLoader(TestCasesItem(), response=response)
-    #         components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract()
-    #
-    #         # Component Names
-    #         for compName in components:
-    #             testitem.add_value('component', compName)
-    #             print('Verify ' + compName + ' Component')
-    #
-    #             requirements = row.select(".//td[3]/div[contains(@class,'content-wrapper')]/ul/li | .//td[3][contains(@class,'confluenceTd')]/ul/li")
-    #             for req in requirements:
-    #                 testitem.add_value('generalreq', req.xpath("string()").extract())
-    #
-    #             yield testitem.load_item()
-    #
-    #     return testitem
