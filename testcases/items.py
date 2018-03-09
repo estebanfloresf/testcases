@@ -10,20 +10,20 @@ import scrapy
 
 class TestCasesItem(scrapy.Item):
     component = scrapy.Field()
-    generalreq = scrapy.Field()
-    responsivereq = scrapy.Field()
+    general = scrapy.Field()
+    responsive = scrapy.Field()
     pass
 
 
+
+
 class Requirements(scrapy.Item):
-    # type => general or device accordingly
-    # type = scrapy.Field()
-    level = scrapy.Field()
+
     description = scrapy.Field()
     pass
 
 
-class ResponsiveReq(scrapy.Item):
+class Responsive(scrapy.Item):
     device = scrapy.Field()
     requirements = scrapy.Field()
     pass
