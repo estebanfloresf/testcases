@@ -11,42 +11,32 @@ class createTestCaseSpider(scrapy.Spider):
     http_user = settings.get('HTTP_USER')
     http_pass = settings.get('HTTP_PASS')
     allowed_domains = ["confluence.verndale.com"]
-    start_urls = ['https://confluence.verndale.com/pages/viewpage.action?spaceKey=GEHC&title=Insights+Module']
+    start_urls = ['https://confluence.verndale.com/display/GEHC/Product+Category+Page+%7C+DOC']
 
     def parse(self, response):
         item = TestCasesItem()
-        table = response.xpath('//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr')
 
-        for row in table:
+        table_xpath = '//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr'
+        table = response.xpath(table_xpath)
 
-            components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract()
-            for compName in components:
-                item['component'] = "Verify " + str(compName) + " component"
-                print('Verify ' + compName + ' Component')
-            # This path is usually the one to be used
-            xpath = ".//td[3]/div[contains(@class,'content-wrapper')]//*/descendant-or-self::*"
+        for index, row in enumerate(table):
+            if (index > 0):
+                components = row.select('.//td[2]/text() | .//td[2]/p/text()').extract()
+                for compName in components:
+                    item['component'] = str(compName)
+                    print('Verify ' + compName + ' Component')
+                # This path is usually the one to be used
+                component_xpath = ".//td[3][contains(@class,'confluenceTd')]"
 
-            # This is for general requirements for pages
-            # xpath = ".//td[3][contains(@class,'confluenceTd')]//*/descendant-or-self::*"
-            requirements = row.select(xpath + "/ul//*/text()").extract()
-            wordstolook = ['Recommendation:', 'Optional', 'Required', 'Standard Value:', 'Note:', 'Notes:',
-                           'Recommended Dimensions:', 'See']
-            wordtojoin = ""
-            finalreq = []
-
-            for req in requirements:
-
-                req = req.replace(u'\xa0', u' ').replace(u'&nbsp', u'').strip()
-                if (req in wordstolook):
-                    wordtojoin = req
-
+                description = ""
+                if (row.select(component_xpath + "/a/text()").extract()):
+                    requirements = row.select(component_xpath + "/a/text()").extract()
+                    description = "".join(requirements)
                 else:
-                    if (wordtojoin != ''):
-                        finalreq.append(wordtojoin + ' ' + req)
-                        wordtojoin = ""
-                    else:
-                        finalreq.append(req)
+                    if (row.select(component_xpath + "/ul//*/text()").extract()):
+                        requirements = row.select(component_xpath + "/ul//*/text()").extract()
 
-            item['general'] = finalreq
-            yield item
+                        description = "".join(requirements)
 
+                item['general'] = str(description)
+                yield item
