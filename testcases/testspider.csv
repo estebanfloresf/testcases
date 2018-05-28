@@ -1,0 +1,6 @@
+component,generalreq,responsivereq
+General,,[{'requirements': 'All below content is displayed for all breakpoints'}]
+Article Banner Image,,"[{'requirements': [{'description': 'If no banner image is managed, fallback will be to theme',
+ 'level': '2.0.0'}], 'device': 'Desktop/Tablet:'}]"
+Theme,,[{}]
+Banner Content,,[{}]

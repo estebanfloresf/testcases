@@ -11,7 +11,7 @@ class createTestCaseSpider(scrapy.Spider):
     http_user = settings.get('HTTP_USER')
     http_pass = settings.get('HTTP_PASS')
     allowed_domains = ["confluence.verndale.com"]
-    start_urls = ['https://confluence.verndale.com/display/GEHC/Product+Category+Page+%7C+DOC']
+    start_urls = ['https://confluence.verndale.com/display/GEHC/Pagination']
 
     def parse(self, response):
         item = TestCasesItem()
@@ -31,12 +31,15 @@ class createTestCaseSpider(scrapy.Spider):
                 description = ""
                 if (row.select(component_xpath + "/a/text()").extract()):
                     requirements = row.select(component_xpath + "/a/text()").extract()
-                    description = "".join(requirements)
+                    description = "|".join(requirements)
                 else:
                     if (row.select(component_xpath + "/ul//*/text()").extract()):
                         requirements = row.select(component_xpath + "/ul//*/text()").extract()
-
-                        description = "".join(requirements)
+                        description = "|".join(requirements)
+                    else:
+                        if (row.select(component_xpath +"/div"+ "/ul//*/text()").extract()):
+                            requirements = row.select(component_xpath +"/div"+ "/ul//*/text()").extract()
+                            description = "|".join(requirements)
 
                 item['general'] = str(description)
                 yield item

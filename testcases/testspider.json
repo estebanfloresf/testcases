@@ -1,0 +1,36 @@
+[
+  {
+    "component": "General",
+    "responsivereq": [
+      {
+        "requirements": "All below content is displayed for all breakpoints"
+      }
+    ]
+  },
+  {
+    "component": "Article Banner Image",
+    "responsivereq": [
+      {
+        "requirements": [
+          {
+            "level": "2.0.0",
+            "description": "If no banner image is managed, fallback will be to theme"
+          }
+        ],
+        "device": "Desktop/Tablet:"
+      }
+    ]
+  },
+  {
+    "component": "Theme",
+    "responsivereq": [
+      {}
+    ]
+  },
+  {
+    "component": "Banner Content",
+    "responsivereq": [
+      {}
+    ]
+  }
+]
