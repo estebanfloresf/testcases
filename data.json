@@ -1,0 +1,81 @@
+[{
+    "component": "general",
+    "testcases": [{
+        "0": "verify all below content is displayed for all breakpoints"
+    }, {
+        "1": "verify content will be displayed based on the content that is managed and available at the course detail level"
+    }, {
+        "2": "verify if there is no content managed for this module at the course detail level, the module should fall back to the content managed in the site settings"
+    }]
+}, {
+    "component": "title",
+    "testcases": [{
+        "0": "verify optional content managed text",
+        "tag": "text"
+    }, {
+        "1": "verify if no text is managed, below content will move up to take its place",
+        "tag": "text"
+    }, {
+        "2": "verify text is not limited and will wrap as required",
+        "tag": "text"
+    }, {
+        "3": "verify aligned left"
+    }, {
+        "4": "verify not clickable",
+        "tag": "cta"
+    }]
+}, {
+    "component": "contact items",
+    "testcases": [{
+        "0": "verify optional content-managed contact items will be displayed in the order they are managed from top to bottom"
+    }, {
+        "1": "verify content authors should have the ability to manage this field as part of the site settings and at the course detail level"
+    }, {
+        "2": "verify content authors should have the ability to managed up to 4 contact items"
+    }, {
+        "3": "verify if the content author manages more than 4 contact items, only the first 4 will be displayed"
+    }, {
+        "4": "verify optional content managed icon will be displayed for the contact item"
+    }, {
+        "5": "verify if icon is not managed, link description will move left to take its place",
+        "tag": "link"
+    }, {
+        "6": "verify required content managed link will be the click-to destination for the contact item",
+        "tag": "link"
+    }, {
+        "7": "verify the link will only be displayed if a link title has been managed",
+        "tag": "link"
+    }, {
+        "8": "verify display mouse hover state",
+        "tag": "cta"
+    }, {
+        "9": "verify user is directed to the content-managed link location for the contact item",
+        "tag": "link"
+    }]
+}, {
+    "component": "unauthenticated registration message",
+    "testcases": [{
+        "0": "verify this should only be displayed if the user has not been authenticated"
+    }, {
+        "1": "verify optional content managed rtf (rich text format) which will give the flexibility to format the font style, color, size etc. to create the required look and feel. images/video can also be displayed through the rtf as well as linking within the content.",
+        "tag": "image"
+    }, {
+        "2": "verify text is not limited and will wrap as required",
+        "tag": "text"
+    }]
+}, {
+    "component": "authenticated registration message",
+    "testcases": [{
+        "0": "verify optional content managed rtf (rich text format) which will give the flexibility to format the font style, color, size etc. to create the required look and feel. images/video can also be displayed through the rtf as well as linking within the content.",
+        "tag": "image"
+    }, {
+        "1": "verify text is not limited and will wrap as required",
+        "tag": "text"
+    }]
+}, {
+    "component": "mobile/tablet",
+    "testcases": [{
+        "0": "verify layout displays accordingly as in the designs",
+        "tag": "mobile"
+    }]
+}]

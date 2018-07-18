@@ -1,13 +1,17 @@
 from scrapy import cmdline
-import sys
-#
-# if(sys.argv[0]):
-#     print(" System args: %s" % sys.argv[0] )
-#     cmdline.execute(("scrapy crawl testspider -a url=https://confluence.verndale.com/display/GEHC/Footer+%7C+DOC").split())
-#
-#
-cmdline.execute("scrapy crawl createTestCase".split())
-# cmdline.execute(("scrapy crawl testspider -a "+str(sys.argv[1])).split())
-#
-#
-# #
+import os
+import inspect
+import logging
+
+path = os.path.abspath(os.path.join(os.path.dirname(
+    os.path.realpath(__file__)), os.pardir))  # script directory
+
+print('Main File executed')
+
+# To generate the verified labels from the input excel (uncomment line below)
+# os.system('python '+path+'\\utils\\generateTC.py')
+# To Make a scrape of the confluence page (uncomment line below)
+# cmdline.execute("scrapy crawl createTestCase".split())
+
+# To read excel file
+os.system('python '+path+'\\utils\\readTestCases.py')

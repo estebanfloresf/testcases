@@ -9,7 +9,7 @@ class createTestCase():
     def __init__(self):
         self.dir_path = os.path.dirname(os.path.realpath(__file__))
         
-        self.wb = load_workbook(self.dir_path+'\\inputTC.xlsx')
+        self.wb = load_workbook(self.dir_path+'\\files\\inputTC.xlsx')
         self.ws = self.wb['Sheet1']
      
         self.commonWords = ["note:","notes:","important note:","onclick/ontap","consists of:"]
