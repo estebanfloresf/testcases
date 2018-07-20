@@ -15,7 +15,8 @@ class createTestCaseSpider(scrapy.Spider):
 
     def parse(self, response):
         item = TestCasesItem()
-
+        title = response.xpath('//*[@id="title-text"]/a/text()').extract_first()
+        print('Documentation: '+title)
         table_xpath = '//*[@id="main-content"]/div/div[4]/div/div/div[1]/table/tbody/tr'
         table = response.xpath(table_xpath)
 

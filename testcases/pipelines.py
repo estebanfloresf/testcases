@@ -22,7 +22,8 @@ class CSVExportPipelines(object):
         return pipeline
 
     def spider_opened(self, spider):
-        file = open('%s.csv' % spider.name, 'wb')
+        path = 'C:\\Users\\Esteban.Flores\\PycharmProjects\\Scrapy\\testcases\\testcases\\data\\csv\\'
+        file = open(path+'%s.csv' % spider.name, 'wb')
         self.files[spider] = file
         self.exporter = CsvItemExporter(file, include_headers_line=True, join_multivalued='|', lineterminator='\n')
         self.exporter.fields_to_export = ['component','general','responsive']
@@ -54,7 +55,8 @@ class JsonExportPipelines(object):
             return pipeline
 
         def spider_opened(self, spider):
-            file = open('%s.json' % spider.name, 'wb')
+            path = 'C:\\Users\\Esteban.Flores\\PycharmProjects\\Scrapy\\testcases\\testcases\\data\\json\\'
+            file = open(path+'%s.json' % spider.name, 'wb')
             self.files[spider] = file
             self.exporter = JsonItemExporter(file, encoding='utf-8', ensure_ascii=False)
             self.exporter.start_exporting()
