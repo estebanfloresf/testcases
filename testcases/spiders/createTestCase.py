@@ -31,15 +31,16 @@ class createTestCaseSpider(scrapy.Spider):
 
                 description = ""
                 if (row.select(component_xpath + "/a/text()").extract()):
-                    requirements = row.select(component_xpath + "/a/text()").extract()
+                    requirements = row.select(component_xpath + "/a//text()").extract()
                     description = "|".join(requirements)
                 else:
                     if (row.select(component_xpath + "/ul//*/text()").extract()):
-                        requirements = row.select(component_xpath + "/ul//*/text()").extract()
+                        requirements = row.select(component_xpath + "/ul//li//text()").extract()
+                        print(requirements)
                         description = "|".join(requirements)
                     else:
                         if (row.select(component_xpath +"/div"+ "/ul//*/text()").extract()):
-                            requirements = row.select(component_xpath +"/div"+ "/ul//*/text()").extract()
+                            requirements = row.select(component_xpath +"/div"+ "/ul//li//text()").extract()
                             description = "|".join(requirements)
 
                 item['requirements'] = str(description)
